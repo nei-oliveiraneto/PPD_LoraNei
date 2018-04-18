@@ -11,6 +11,7 @@ add_100_svc(operandos *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
+	printf("Received: %d and %d\n", argp->x, argp->y);
 	result = argp->x + argp->y;
 
 	return &result;
@@ -21,6 +22,7 @@ sub_100_svc(operandos *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
+	printf("Received: %d and %d\n", argp->x, argp->y);
 	result = argp->x - argp->y;
 
 	return &result;

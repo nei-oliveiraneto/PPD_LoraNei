@@ -16,8 +16,8 @@ int main( int argc, char *argv[] )
 		exit (1);
 	}
 	host = argv[1];
-	int x = argv[2];
-	int y = argv[3];
+	int x = atoi(argv[2]);
+	int y = atoi(argv[3]);
 	int operation = atoi(argv[4]);
 
 	CLIENT *clnt;
@@ -26,11 +26,10 @@ int main( int argc, char *argv[] )
 		clnt_pcreateerror (host);
 		exit (1);
 	}
-
+	
 	operandos op;
-	op.x = atoi(x);
-	op.y = atoi(y);
-
+	op.x = x;
+	op.y = y;
 	if( operation == 0 )
 	{
 		int *result = add_100( &op, clnt );
@@ -39,7 +38,7 @@ int main( int argc, char *argv[] )
 			clnt_perror (clnt, "add call failed");
 			exit(1);
 		}
-		printf( "Result of sum is: %d\n", &result );
+		printf( "Result of sum is: %d\n", *result );
 
 	}
 	else
@@ -50,7 +49,7 @@ int main( int argc, char *argv[] )
 			clnt_perror (clnt, "sub call failed");
 			exit(1);
 		}
-		printf( "Result of sub is: %d\n", &result );
+		printf( "Result of sub is: %d\n", *result );
 	}
 
 	clnt_destroy(clnt);
