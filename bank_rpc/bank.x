@@ -10,7 +10,7 @@ struct TransactionInfo
 	int cpf;
 	int valor;
 	bool operation;
-	int indentifier;
+	int transactionCount;
 };
 
 program BANK
@@ -19,7 +19,7 @@ program BANK
 	{
 		bool ABERTURA(int) = 1;
  		bool FECHAMENTO(int) = 2;
- 		bool AUTENTICA(int) = 3;
+ 		int AUTENTICA(int) = 3;
  		bool TRANSACAO(TransactionInfo) = 4;
  		int CONSULTA(int) = 5;
  	} = 100;

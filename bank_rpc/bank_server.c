@@ -16,6 +16,7 @@ int get_account_index_by_cpf(int cpf)
 			return i;
 		}
 	}
+	printf("CPF nao encontrado!\n");
 	return -1;
 }
 
@@ -29,6 +30,7 @@ int get_last_available_index( )
 			return i;
 		}
 	}
+	printf("Lista de clientes cheia!\n");
 	return -1;
 
 }
@@ -44,7 +46,7 @@ abertura_100_svc(int *argp, struct svc_req *rqstp)
 	 */
 	int cpf = *argp;
 
-	if( get_account_index_by_cpf( cpf ) == -1 )
+	if( get_account_index_by_cpf( cpf ) != -1 )
 	{
 		result = 0;
 		return &result;
@@ -61,7 +63,7 @@ abertura_100_svc(int *argp, struct svc_req *rqstp)
 
 	newAccount.cpf = cpf;
 	newAccount.saldo = 0;
-	newAccount.transactionCount = 0;
+	newAccount.transactionCount = 1;
 
 	Contas[lastIndex] = newAccount;
 
@@ -92,23 +94,25 @@ fechamento_100_svc(int *argp, struct svc_req *rqstp)
 	return &result;
 }
 
-bool_t *
+int *
 autentica_100_svc(int *argp, struct svc_req *rqstp)
 {
-	static bool_t  result;
+	static int  result;
 
 	/*
 	 * insert server code here
 	 */
 	int cpf = *argp;
+
+	printf("Autenticando cpf: %d\n", cpf);
 	int index = get_account_index_by_cpf( cpf );
 	if( index == -1 )
 	{
-		result = 0;
+		result = -1;
 		return &result;
 	}
 
-	result = 1;
+	result = Contas[index].transactionCount;
 	return &result;
 }
 
@@ -128,11 +132,23 @@ transacao_100_svc(TransactionInfo *argp, struct svc_req *rqstp)
 		return &result;
 	}
 
-	//currently not caring about idepotence
+	if( argp->transactionCount != Contas[index].transactionCount + 1 )
+	{
+		result = 0;
+		printf("Operacao repetida, cancelando operacao\n");
+		return &result;
+	}
+
 	if( argp->operation == 0 )
-		Contas[index].saldo = Contas[index].saldo + argp->valor;
-	else
+	{
 		Contas[index].saldo = Contas[index].saldo - argp->valor;
+		printf("Retirando\n");
+	}
+	else
+		Contas[index].saldo = Contas[index].saldo + argp->valor;
+		printf("Depositando\n");
+
+	Contas[index].transactionCount++;
 	
 	result = 1;
 	return &result;

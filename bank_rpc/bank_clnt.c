@@ -39,15 +39,15 @@ fechamento_100(int *argp, CLIENT *clnt)
 	return (&clnt_res);
 }
 
-bool_t *
+int *
 autentica_100(int *argp, CLIENT *clnt)
 {
-	static bool_t clnt_res;
+	static int clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, AUTENTICA,
 		(xdrproc_t) xdr_int, (caddr_t) argp,
-		(xdrproc_t) xdr_bool, (caddr_t) &clnt_res,
+		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}

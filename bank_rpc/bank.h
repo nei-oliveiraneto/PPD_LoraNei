@@ -28,7 +28,7 @@ struct TransactionInfo {
 	int cpf;
 	int valor;
 	bool_t operation;
-	int indentifier;
+	int transactionCount;
 };
 typedef struct TransactionInfo TransactionInfo;
 
@@ -43,8 +43,8 @@ extern  bool_t * abertura_100_svc(int *, struct svc_req *);
 extern  bool_t * fechamento_100(int *, CLIENT *);
 extern  bool_t * fechamento_100_svc(int *, struct svc_req *);
 #define AUTENTICA 3
-extern  bool_t * autentica_100(int *, CLIENT *);
-extern  bool_t * autentica_100_svc(int *, struct svc_req *);
+extern  int * autentica_100(int *, CLIENT *);
+extern  int * autentica_100_svc(int *, struct svc_req *);
 #define TRANSACAO 4
 extern  bool_t * transacao_100(TransactionInfo *, CLIENT *);
 extern  bool_t * transacao_100_svc(TransactionInfo *, struct svc_req *);
@@ -61,8 +61,8 @@ extern  bool_t * abertura_100_svc();
 extern  bool_t * fechamento_100();
 extern  bool_t * fechamento_100_svc();
 #define AUTENTICA 3
-extern  bool_t * autentica_100();
-extern  bool_t * autentica_100_svc();
+extern  int * autentica_100();
+extern  int * autentica_100_svc();
 #define TRANSACAO 4
 extern  bool_t * transacao_100();
 extern  bool_t * transacao_100_svc();

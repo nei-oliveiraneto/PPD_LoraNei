@@ -34,13 +34,13 @@ xdr_TransactionInfo (XDR *xdrs, TransactionInfo *objp)
 				 return FALSE;
 			 if (!xdr_bool (xdrs, &objp->operation))
 				 return FALSE;
-			 if (!xdr_int (xdrs, &objp->indentifier))
+			 if (!xdr_int (xdrs, &objp->transactionCount))
 				 return FALSE;
 		} else {
 			IXDR_PUT_LONG(buf, objp->cpf);
 			IXDR_PUT_LONG(buf, objp->valor);
 			IXDR_PUT_BOOL(buf, objp->operation);
-			IXDR_PUT_LONG(buf, objp->indentifier);
+			IXDR_PUT_LONG(buf, objp->transactionCount);
 		}
 		return TRUE;
 	} else if (xdrs->x_op == XDR_DECODE) {
@@ -52,13 +52,13 @@ xdr_TransactionInfo (XDR *xdrs, TransactionInfo *objp)
 				 return FALSE;
 			 if (!xdr_bool (xdrs, &objp->operation))
 				 return FALSE;
-			 if (!xdr_int (xdrs, &objp->indentifier))
+			 if (!xdr_int (xdrs, &objp->transactionCount))
 				 return FALSE;
 		} else {
 			objp->cpf = IXDR_GET_LONG(buf);
 			objp->valor = IXDR_GET_LONG(buf);
 			objp->operation = IXDR_GET_BOOL(buf);
-			objp->indentifier = IXDR_GET_LONG(buf);
+			objp->transactionCount = IXDR_GET_LONG(buf);
 		}
 	 return TRUE;
 	}
@@ -69,7 +69,7 @@ xdr_TransactionInfo (XDR *xdrs, TransactionInfo *objp)
 		 return FALSE;
 	 if (!xdr_bool (xdrs, &objp->operation))
 		 return FALSE;
-	 if (!xdr_int (xdrs, &objp->indentifier))
+	 if (!xdr_int (xdrs, &objp->transactionCount))
 		 return FALSE;
 	return TRUE;
 }

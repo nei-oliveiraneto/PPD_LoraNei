@@ -5,7 +5,7 @@
  */
 
 #include "bank.h"
-
+#include <unistd.h>
 
 void
 bank_100(char *host)
@@ -15,7 +15,7 @@ bank_100(char *host)
 	int  abertura_100_arg;
 	bool_t  *result_2;
 	int  fechamento_100_arg;
-	bool_t  *result_3;
+	int  *result_3;
 	int  autentica_100_arg;
 	bool_t  *result_4;
 	TransactionInfo  transacao_100_arg;
@@ -39,7 +39,7 @@ bank_100(char *host)
 		clnt_perror (clnt, "call failed");
 	}
 	result_3 = autentica_100(&autentica_100_arg, clnt);
-	if (result_3 == (bool_t *) NULL) {
+	if (result_3 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
 	result_4 = transacao_100(&transacao_100_arg, clnt);
@@ -56,16 +56,200 @@ bank_100(char *host)
 }
 
 
+int subtransaction( int cpf, int value, int operation, CLIENT* clnt  )
+{
+	int *transactionCount;
+	transactionCount = autentica_100( &cpf, clnt );
+
+	if( *transactionCount == -1 )
+	{
+		printf("Falha ao autenticar cpf\n");
+		return -1;
+	}
+
+	TransactionInfo ti;
+
+	ti.cpf = cpf;
+	ti.valor = value;
+	ti.operation = (bool_t)operation;
+	ti.transactionCount = *transactionCount+1;
+
+	bool_t* status;
+	status = transacao_100( &ti, clnt );
+
+	if( status == (bool_t*)NULL )
+	{
+		printf("Erro de timeout, tentando transacao novamente...\n");
+		sleep( 2 );
+		status = transacao_100( &ti, clnt );
+	}
+
+	if( status == 0 )
+	{
+		printf("Erro na operacao");
+		return -1;
+	}
+
+	return 0;
+
+}
+
 int
 main (int argc, char *argv[])
 {
 	char *host;
 
-	if (argc < 2) {
-		printf ("usage: %s server_host\n", argv[0]);
+	if (argc < 3) {
+		printf ("uso: server_host, 0 ( agencia ) ou 1 ( caixa )\n");
 		exit (1);
 	}
 	host = argv[1];
-	bank_100 (host);
+
+	CLIENT *clnt;
+
+	clnt = clnt_create (host, BANK, VERSAO, "udp");
+	if (clnt == NULL) {
+		clnt_pcreateerror (host);
+		exit (1);
+	}
+
+	if( atoi(argv[2]) == 1 )
+	{
+		printf( "Digite seu cpf para logar: " );
+
+		int cpf, *autentic;
+
+		scanf( "%d", &cpf );
+
+		autentic = autentica_100(&cpf, clnt);
+		if (autentic == (bool_t *) NULL)
+		{
+			clnt_perror (clnt, "call failed");
+			return -1;
+		}
+		if( *autentic == -1)
+		{
+			printf("Falha ao autenticar o cpf\n");
+			return -1;
+		}
+
+		int option;
+		do
+		{
+			printf("Escolha a operacao: \n\t1-Saque\n\t2-Deposito\n\t3-Consulta de Saldo\n\t4-Sair\n");
+			scanf( "%d", &option );
+			int value;
+			int *result_5;
+
+				switch(option)
+				{
+					case 1:
+						printf("Diga o valor que deseja sacar: \n");
+						scanf("%d", &value);
+						subtransaction( cpf, value, option-1, clnt );
+					break;
+
+					case 2:
+						printf("Diga o valor que deseja depositar: \n");
+						scanf("%d", &value);
+						subtransaction( cpf, value, option-1, clnt );
+					break;
+
+					case 3:
+						
+						result_5 = consulta_100(&cpf, clnt);
+						if (result_5 == (int *) NULL) 
+						{
+							clnt_perror (clnt, "call failed");
+						}
+						printf("Saldo atual: %d\n", *result_5);
+
+					break;
+
+					case 4:
+						option = 4;
+					break;
+				}
+				
+		} while(option!=4);
+
+	}
+	else
+	{
+		int option;
+		do
+		{
+			printf("Escolha a operacao: \n\t1-Abertura de conta\n\t2-Fechamento\n\t3-Autenticacao de conta\n\t4-Deposito, Saque ou Saldo em conta corrente\n\t5-Encerrar\n");
+			scanf( "%d", &option );
+			int value, cpf;
+			int *result;
+
+				switch(option)
+				{
+					case 1:
+						printf("Diga o cpf para abrir a conta: \n");
+						scanf("%d", &cpf);
+						result = abertura_100(&cpf, clnt);
+						if (result == (bool_t *) NULL) {
+							clnt_perror (clnt, "call failed");
+						}
+						else if( *result == 0 )
+						{
+							printf("Falha na abertura de conta\n");
+						}
+						else
+						{
+							printf("Conta criada com sucesso\n");
+						}
+						
+					break;
+
+					case 2:
+						printf("Diga o cpf para fechamento de conta: \n");
+						scanf("%d", &cpf);
+						result = fechamento_100(&cpf, clnt);
+						if (result == (bool_t *) NULL) {
+							clnt_perror (clnt, "call failed");
+						}
+						else if( *result == 0 )
+						{
+							printf("Falha no fechamento de conta\n");
+						}
+						else
+						{
+							printf("Conta encerrada com sucesso\n");
+						}
+					break;
+
+					case 3:
+						
+						printf("Diga o cpf para autenticamento de conta: \n");
+						scanf("%d", &cpf);
+						result = autentica_100(&cpf, clnt);
+						if (result == (bool_t *) NULL) {
+							clnt_perror (clnt, "call failed");
+						}
+						else if( *result == -1 )
+						{
+							printf("Falha na autenticamento de conta\n");
+						}
+						else
+						{
+							printf("Autenticacao executada com sucesso\n");
+						}
+					break;
+
+					case 4:
+						option = 4;
+
+					default:
+						option = 4;
+					break;
+				}
+				
+		} while(option!=4);
+	}
+
+	//bank_100 (host);
 exit (0);
 }

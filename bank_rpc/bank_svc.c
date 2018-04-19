@@ -49,7 +49,7 @@ bank_100(struct svc_req *rqstp, register SVCXPRT *transp)
 
 	case AUTENTICA:
 		_xdr_argument = (xdrproc_t) xdr_int;
-		_xdr_result = (xdrproc_t) xdr_bool;
+		_xdr_result = (xdrproc_t) xdr_int;
 		local = (char *(*)(char *, struct svc_req *)) autentica_100_svc;
 		break;
 
@@ -89,6 +89,7 @@ int
 main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
+	memset( Contas, 0, sizeof( Conta )*NUM_OF_ACCOUNTS );
 
 	pmap_unset (BANK, VERSAO);
 
