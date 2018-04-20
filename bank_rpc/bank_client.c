@@ -240,14 +240,59 @@ main (int argc, char *argv[])
 					break;
 
 					case 4:
-						option = 4;
+
+						printf("Diga o cpf para efetuar as operacoes: \n");
+						scanf("%d", &cpf);
+						result = autentica_100(&cpf, clnt);
+						if (result == (bool_t *) NULL) {
+							clnt_perror (clnt, "call failed");
+						}
+						else if( *result == -1 )
+						{
+							printf("Falha na autenticamento de conta\n");
+						}
+						else
+						{
+							int option2;
+							printf("Autenticacao executada com sucesso\n");
+							printf("Escolha a operacao: \n\t1-Saque\n\t2-Deposito\n\t3-Consulta de Saldo\n\t4-Sair\n");
+							scanf( "%d", &option2 );
+							int *result_5;
+
+							switch(option2)
+							{
+								case 1:
+									printf("Diga o valor que deseja sacar: \n");
+									scanf("%d", &value);
+									subtransaction( cpf, value, option2-1, clnt );
+								break;
+
+								case 2:
+									printf("Diga o valor que deseja depositar: \n");
+									scanf("%d", &value);
+									subtransaction( cpf, value, option2-1, clnt );
+								break;
+
+								case 3:
+									
+									result_5 = consulta_100(&cpf, clnt);
+									if (result_5 == (int *) NULL) 
+									{
+										clnt_perror (clnt, "call failed");
+									}
+									printf("Saldo atual: %d\n", *result_5);
+
+								break;
+							}
+
+						}
 
 					default:
 						option = 4;
 					break;
 				}
 				
-		} while(option!=4);
+		} while(option!=5);
 	}
 
 	//bank_100 (host);

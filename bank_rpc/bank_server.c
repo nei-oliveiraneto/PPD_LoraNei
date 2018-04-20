@@ -145,9 +145,11 @@ transacao_100_svc(TransactionInfo *argp, struct svc_req *rqstp)
 		printf("Retirando\n");
 	}
 	else
+	{
 		Contas[index].saldo = Contas[index].saldo + argp->valor;
 		printf("Depositando\n");
-
+	}
+	
 	Contas[index].transactionCount++;
 	
 	result = 1;
